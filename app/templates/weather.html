@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather Forecast</title>
+    <style>
+      .inline-elements {
+        display: flex;
+        align-items: center;
+      }
+      .inline-elements h4 {
+        margin: 0;
+        margin-right: 10px;
+      }
+      .autocomplete-items {
+        border: 1px solid #d4d4d4;
+        border-bottom: none;
+        border-top: none;
+        z-index: 99;
+        position: absolute;
+        left: 7.5%;
+        background-color: #fff;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+      .autocomplete-items div {
+        padding: 10px;
+        cursor: pointer;
+        background-color: #fff;
+        border-bottom: 1px solid #d4d4d4;
+      }
+      .autocomplete-items div:hover {
+        background-color: #e9e9e9;
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
+    />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+  </head>
+  <body>
+    <h1>Прогноз погоды</h1>
+    <form action="/weather" method="post">
+      <label for="city">Введите город:</label>
+      <input type="text" id="city" name="city" required />
+      <button type="submit">Узнать погоду</button>
+    </form>
+    <div id="results">
+      {% if last_query %}
+      <h3>Твой последний запрос был по городу: {{ last_query }}</h3>
+      <div class="inline-elements">
+        <h4>Показать прогноз в этом городе?</h4>
+        <form method="post" action="/weather_last">
+          <input type="hidden" name="last_query" value="{{ last_query }}" />
+          <button type="submit">Показать</button>
+        </form>
+      </div>
+      {% endif %} {% if weather_data %}
+      <h2>Прогноз на ближайшие 3 часа в городе: {{ last_query }}</h2>
+      <ul>
+        {% for date, temp in weather_data %}
+        <li>Время: {{ date }}, Температура: {{ temp }}°C</li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </div>
+    <script>
+      $(function () {
+        $("#city").autocomplete({
+          source: function (request, response) {
+            $.ajax({
+              url: "/autocomplete",
+              dataType: "json",
+              data: {
+                term: request.term,
+              },
+              success: function (data) {
+                response(data);
+              },
+            });
+          },
+          minLength: 2,
+          select: function (event, ui) {
+            $("#city").val(ui.item.value);
+          },
+        });
+      });
+    </script>
+  </body>
+</html>
