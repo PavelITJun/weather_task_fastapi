@@ -47,6 +47,11 @@
 Создайте файл `.env_non_dev` в корне проекта и добавьте туда следующие переменные окружения:
 
 ```env
-DATABASE_URL=postgres://user:password@db:5432/dbname
-SECRET_KEY=your_secret_key
+MODE=DEV
+
+DB_HOST
+DB_PORT
+DB_USER
+DB_PASS
+DB_NAME
 ```
